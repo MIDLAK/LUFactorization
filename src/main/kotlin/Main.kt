@@ -24,7 +24,8 @@ fun main(args: Array<String>) {
     solver.printLU()
 
     println("|A| = ${solver.determinant()}")
-    solver.inverse(aMatrix).printMatrix("A^-1")
+    val inverseMatrix = solver.inverse(aMatrix)
+    inverseMatrix.printMatrix("A^-1")
 
     // Решение системы
     val solution = solver.solve(aMatrix, bVector)
@@ -32,5 +33,12 @@ fun main(args: Array<String>) {
 
     val residual = aMatrix * solution - bVector
     residual.printVector("Невязки")
+
+    val aNorm = aMatrix.norm()
+    val aInverseNorm = inverseMatrix.norm()
+
+    //k(A) = ||A|| * ||A^-1||
+    //чем обусловленость (чувствительность) меньше, тем лучше
+    println("Обусловленность A = %.2f".format(aNorm * aInverseNorm))
 
 }

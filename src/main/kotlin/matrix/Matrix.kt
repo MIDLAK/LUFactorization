@@ -1,5 +1,7 @@
 package org.vadim.matrix
 
+import kotlin.math.abs
+
 class Matrix(private val size: Int) {
     val data: Array<DoubleArray> = Array(size) { DoubleArray(size) }
 
@@ -21,6 +23,9 @@ class Matrix(private val size: Int) {
             println()
         }
     }
+
+    // бесконечная норма (нужна для обусловленности)
+    fun norm(): Double = data.maxOf { row -> row.sumOf { abs((it)) } }
 
     // умножение матрицы на вектор (для невязок)
     operator fun times(vector: Vector): Vector {
