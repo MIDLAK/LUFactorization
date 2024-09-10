@@ -16,4 +16,13 @@ class Vector(private val size: Int) {
             println("[$i]: ${"%.2f".format(data[i])}")
         }
     }
+
+    // вычитание векторов (для невязок)
+    operator fun minus(other: Vector): Vector {
+        val result = Vector(size)
+        for (i in 0 until size) {
+            result.data[i] = data[i] - other.data[i]
+        }
+        return result
+    }
 }

@@ -29,4 +29,8 @@ fun main(args: Array<String>) {
     // Решение системы
     val solution = solver.solve(aMatrix, bVector)
     solution.printVector("Решение x")
+
+    val residual = aMatrix * solution - bVector
+    residual.printVector("Невязки")
+
 }
