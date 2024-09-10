@@ -4,29 +4,29 @@ import org.vadim.matrix.Matrix
 import org.vadim.matrix.Vector
 
 class LUSolver(private val size: Int) {
-    private val L = Matrix(size)
-    private val U = Matrix(size)
+    private val lower = Matrix(size)
+    private val upper = Matrix(size)
 
     fun luDecomposition(aMatrix: Matrix) {
         for (i in 0 until size) {
             for (j in i until size) {
-                U.data[i][j] = aMatrix.data[i][j] // Заполняем верхний треугольник U
+                upper.data[i][j] = aMatrix.data[i][j] // Заполняем верхний треугольник U
                 var sum = 0.0
                 for (k in 0 until i) {
-                    sum += L.data[i][k] * U.data[k][j]
+                    sum += lower.data[i][k] * upper.data[k][j]
                 }
-                U.data[i][j] = aMatrix.data[i][j] - sum
+                upper.data[i][j] = aMatrix.data[i][j] - sum
             }
 
             for (j in i until size) {
                 if (i == j) {
-                    L.data[i][i] = 1.0 // Диагональные элементы L равны 1
+                    lower.data[i][i] = 1.0 // Диагональные элементы L равны 1
                 } else {
                     var sum = 0.0
                     for (k in 0 until i) {
-                        sum += L.data[j][k] * U.data[k][i]
+                        sum += lower.data[j][k] * upper.data[k][i]
                     }
-                    L.data[j][i] = (aMatrix.data[j][i] - sum) / U.data[i][i]
+                    lower.data[j][i] = (aMatrix.data[j][i] - sum) / upper.data[i][i]
                 }
             }
         }
@@ -36,22 +36,22 @@ class LUSolver(private val size: Int) {
         val y = DoubleArray(size)
         val x = DoubleArray(size)
 
-        // Прямой ход (решаем LY = B)
+        // прямой ход (LY = B)
         for (i in 0 until size) {
             var sum = 0.0
             for (j in 0 until i) {
-                sum += L.data[i][j] * y[j]
+                sum += lower.data[i][j] * y[j]
             }
             y[i] = b.data[i] - sum
         }
 
-        // Обратный ход (решаем UX = Y)
+        // обратный ход (UX = Y)
         for (i in size - 1 downTo 0) {
             var sum = 0.0
             for (j in i + 1 until size) {
-                sum += U.data[i][j] * x[j]
+                sum += upper.data[i][j] * x[j]
             }
-            x[i] = (y[i] - sum) / U.data[i][i]
+            x[i] = (y[i] - sum) / upper.data[i][i]
         }
 
         val result = Vector(size)
@@ -63,7 +63,36 @@ class LUSolver(private val size: Int) {
     }
 
     fun printLU() {
-        L.printMatrix("L")
-        U.printMatrix("U")
+        lower.printMatrix("L")
+        upper.printMatrix("U")
+    }
+
+    // |A| = произведение диагонали U (upper)
+    fun determinant(): Double {
+        var det = 1.0
+        for (i in 0 until size) {
+            det *= upper.data[i][i]
+        }
+
+        return det
+    }
+
+    // A*X_i = e_i
+    // X_i - столбец обратной матрицы
+    // e_i - столбец единичной матрицы
+    fun inverse(matrix: Matrix): Matrix {
+        val inverse = Matrix(size)
+        for (i in 0 until size) {
+            val e = Vector(size)
+            e.data[i] = 1.0
+            val xColumn = solve(matrix, e)
+
+            // запись столбца решения
+            for (j in 0 until size) {
+                inverse.data[j][i] = xColumn.data[j]
+            }
+        }
+
+        return inverse
     }
 }

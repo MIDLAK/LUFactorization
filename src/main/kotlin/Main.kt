@@ -5,7 +5,9 @@ import org.vadim.matrix.Matrix
 import org.vadim.matrix.Vector
 
 fun main(args: Array<String>) {
-    val size = 3
+    print("Размерность матрицы A:")
+    val size = readln().toInt()
+
     val aMatrix = Matrix(size)
     val bVector = Vector(size)
 
@@ -20,6 +22,9 @@ fun main(args: Array<String>) {
     // LU-разложение
     solver.luDecomposition(aMatrix)
     solver.printLU()
+
+    println("|A| = ${solver.determinant()}")
+    solver.inverse(aMatrix).printMatrix("A^-1")
 
     // Решение системы
     val solution = solver.solve(aMatrix, bVector)
